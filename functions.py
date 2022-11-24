@@ -3,6 +3,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 import getpass
 
+# this function is called if the user is not already logged in
+# it collects the login data from the user and uses it to log in to the site
+# TODO: Add gui for login credential collection
+# TODO: Add option to securely store login credentials
 def loginAttempt(driver):
     # request and store login credentials
     username = input("Enter 7cav.us Username(email):")
@@ -52,7 +56,9 @@ def loginAttempt(driver):
     else:
         print("Invalid Username or Password Detected")
         loginAttempt(driver)
-        
+
+# this function is called if 2FA is detected, it requests the 2FA code and then submits it and completes login
+# TODO: Add gui for 2FA code collection        
 def twoFa(driver):
     WebDriverWait(driver, timeout=10).until(EC.presence_of_element_located((
         By.NAME, 'code'

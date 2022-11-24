@@ -5,19 +5,17 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from functions import loginAttempt
 from functions import twoFa
+
 chrome_options = Options() 
 chrome_options.add_experimental_option("detach", True)
 
-
-# open webdriver browser
+# this calls the webdriver for chrome and brings up the 7cav site
+# TODO: add options for more browsers
+# TODO: build gui for app
 driver = webdriver.Chrome(options=chrome_options)
 print("Opening Browser")
 driver.get('https://7cav.us/')
-print("Opened")
-# attempt to login
 print("Trying to Login")
-# this function performs login using previously acquired details
-
         
 try: 
     driver.find_element(
