@@ -1,11 +1,12 @@
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+import getpass
 
 def loginAttempt(driver):
     # request and store login credentials
     username = input("Enter 7cav.us Username(email):")
-    password = input("Enter 7cav.us Password:")
+    password = getpass.getpass(prompt="Enter 7cav.us Password:")
     try:
         driver.find_element(
             'xpath', '//*[@id="top"]/div[2]/div[2]/div[2]/div/nav/div/div[3]/div[1]/a[1]'
@@ -50,20 +51,20 @@ def loginAttempt(driver):
         print("Logged in")
     else:
         print("Invalid Username or Password Detected")
-        loginAttempt()
+        loginAttempt(driver)
         
 def twoFa(driver):
     WebDriverWait(driver, timeout=10).until(EC.presence_of_element_located((
-        By.CLASS_NAME, 'input'
+        By.NAME, 'code'
     )))
     twoFaField = driver.find_element(
-        By.CLASS_NAME, 'input'
+        By.NAME, 'code'
     )
     twofacode = input("Enter 2FA Code:")
     twoFaField.clear()
     twoFaField.send_keys(twofacode)
     twofaconfirm = driver.find_element(
-        By.CLASS_NAME, 'button--primary button button--icon button--icon--login'
+        By.XPATH, '//*[@id="top"]/div[2]/div[2]/div[6]/div/div/div[2]/div[2]/form/div/dl/dd/div/div[2]/button'
     )
     twofaconfirm.click()
     try:
