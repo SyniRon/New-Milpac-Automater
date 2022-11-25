@@ -155,4 +155,3 @@ def milpacCreate(driver):
         By.NAME, 'custom_fields[promoDate]'
     )
     milpacPromotionDateEntry.send_keys(milpacJoinDate)
-    
