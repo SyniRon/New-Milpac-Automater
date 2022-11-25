@@ -24,7 +24,7 @@ else:
 
 try:
     driver.find_element(
-        "xpath", 
+        "xpath",
         '//*[@id="top"]/div[2]/div[2]/div[6]/div/div/div[2]/div[2]/form/div/div/dl[3]/dd/ul/li/label/span',
     )
 except Exception:
