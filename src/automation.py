@@ -1,4 +1,4 @@
-from functions import loginAttempt, twoFa, milpacNav, milpacCreate
+from functions import loginAttempt, milpacCreate, milpacNav, twoFa
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
