@@ -1,14 +1,14 @@
+import getpass
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-import getpass
 
 # this function is called if the user is not already logged in
 # it collects the login data from the user and uses it to log in to the site
 # TODO: Add gui for login credential collection
 # TODO: Add option to securely store login credentials
-    
-    
+
+
 def loginAttempt(driver):
     username = input("Enter 7cav.us Username(email):")
     password = getpass.getpass(prompt="Enter 7cav.us Password:")
