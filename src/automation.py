@@ -4,7 +4,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from functions import loginAttempt
-from functions import twoFa
+from functions  import twoFa
 
 chrome_options = Options() 
 chrome_options.add_experimental_option("detach", True)
