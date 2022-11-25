@@ -1,7 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from functions import loginAttempt
-from functions import twoFa
+from functions import (loginAttempt, twoFa)
 
 chrome_options = Options()
 chrome_options.add_experimental_option("detach", True)
