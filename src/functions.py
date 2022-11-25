@@ -1,21 +1,22 @@
+import getpass
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-import getpass
 
 # this function is called if the user is not already logged in
 # it collects the login data from the user and uses it to log in to the site
 # TODO: Add gui for login credential collection
 # TODO: Add option to securely store login credentials
+
+
 def loginAttempt(driver):
-    # request and store login credentials
     username = input("Enter 7cav.us Username(email):")
     password = getpass.getpass(prompt="Enter 7cav.us Password:")
     try:
         driver.find_element(
             'xpath', '//*[@id="top"]/div[2]/div[2]/div[2]/div/nav/div/div[3]/div[1]/a[1]'
         )
-    except:
+    except Exception:
         print("Retrying Login")
     else:
         print("Loggin In")
@@ -51,14 +52,16 @@ def loginAttempt(driver):
         driver.find_element(
             'xpath', '//*[@id="kc-content-wrapper"]/div[1]'
         )
-    except:
+    except Exception:
         print("Logged in")
     else:
         print("Invalid Username or Password Detected")
         loginAttempt(driver)
 
 # this function is called if 2FA is detected, it requests the 2FA code and then submits it and completes login
-# TODO: Add gui for 2FA code collection        
+# TODO: Add gui for 2FA code collection
+
+
 def twoFa(driver):
     WebDriverWait(driver, timeout=10).until(EC.presence_of_element_located((
         By.NAME, 'code'
@@ -77,7 +80,7 @@ def twoFa(driver):
         driver.find_element(
             'xpath', '//*[@id="js-XFUniqueId2"]/div/div[1]'
         )
-    except:
+    except Exception:
         print("2FA Confirmed")
     else:
         print("Incorrect 2FA Code")
