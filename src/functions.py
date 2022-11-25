@@ -1,6 +1,7 @@
 import getpass
-from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.by import By
 
 # this function is called if the user is not already logged in
@@ -89,3 +90,69 @@ def twoFa(driver):
         )
         closeTwoFaWarning.click()
         twoFa(driver)
+
+# this function finds the milpac link element on page and then navigates to it
+
+
+def milpacNav(driver):
+    WebDriverWait(driver, timeout=10).until(EC.presence_of_element_located((
+        By.XPATH, '//*[@id="top"]/div[3]/div[2]/div[2]/div/nav/div/div[2]/div/ul/li[2]/div/a'
+    )))
+    milpacLink = driver.find_element(
+        By.XPATH, '//*[@id="top"]/div[3]/div[2]/div[2]/div/nav/div/div[2]/div/ul/li[2]/div/a'
+    )
+    milpacLink.click()
+    
+# this function finds the add new user button, or reports if the user doesn't have permissions
+# it will then request data from the user and add the new milpac
+
+def milpacCreate(driver):
+    WebDriverWait(driver, timeout=10).until(EC.presence_of_element_located((
+        By.XPATH, '//*[@id="top"]/div[3]/div[2]/div[5]/div/div/div[2]/div[1]/div/div/a'
+    )))
+    addUserButton = driver.find_element(
+        "xpath", '//*[@id="top"]/div[3]/div[2]/div[5]/div/div/div[2]/div[1]/div/div/a'
+    )
+    addUserButton.click()
+    WebDriverWait(driver, timeout=10).until(EC.presence_of_element_located((
+        By.XPATH, '//*[@id="top"]/div[3]/div[2]/div[5]/div/div/div[2]/div[2]/div/h1'
+    )))
+    milpacUsername = input("Enter forum username:")
+    milpacUsernameUpdate = input("Update username to the following:")
+    milpacRealName = input("Enter Real Name:")
+    milpacJoinDate = input("Enter Join Date:")
+    milpacUsernameEntry = driver.find_element(
+        By.NAME, 'username'
+    )
+    milpacUsernameEntry.send_keys(milpacUsername)
+    milpacUsernameUpdateEntry = driver.find_element(
+        By.NAME, 'new_username'
+    )
+    milpacUsernameUpdateCheckbox = driver.find_element(
+        By.XPATH, '//*[@id="top"]/div[3]/div[2]/div[5]/div/div/div[2]/div[3]/form/div/div/dl[2]/dd/ul/li/label/i'
+    )
+    milpacUsernameUpdateCheckbox.click()
+    milpacUsernameUpdateEntry.send_keys(milpacUsernameUpdate)
+    milpacRealNameEntry = driver.find_element(
+        By.NAME, 'real_name'
+    )
+    milpacRealNameEntry.send_keys(milpacRealName)
+    milpacRankSelect = driver.find_element(
+        By.NAME, 'rank_id'
+    )
+    select = Select(milpacRankSelect)
+    select.select_by_visible_text('Recruit')
+    milpacPositionSelect = driver.find_element(
+        By.NAME, 'position_id'
+    )
+    select = Select(milpacPositionSelect)
+    select.select_by_visible_text('New Recruit')
+    milpacJoinDateEntry = driver.find_element(
+        By.NAME, 'custom_fields[joinDate]'
+    )
+    milpacJoinDateEntry.send_keys(milpacJoinDate)
+    milpacPromotionDateEntry = driver.find_element(
+        By.NAME, 'custom_fields[promoDate]'
+    )
+    milpacPromotionDateEntry.send_keys(milpacJoinDate)
+    

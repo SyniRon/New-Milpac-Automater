@@ -1,4 +1,4 @@
-from functions import loginAttempt, twoFa
+from functions import loginAttempt, twoFa, milpacNav, milpacCreate
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
@@ -32,3 +32,6 @@ except Exception:
 else:
     print("2FA Required")
     twoFa(driver)
+
+milpacNav(driver)
+milpacCreate(driver)
