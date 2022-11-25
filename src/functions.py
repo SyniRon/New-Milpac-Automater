@@ -1,8 +1,10 @@
 import getpass
+
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support.ui import Select
-from selenium.webdriver.common.by import By
 
 # this function is called if the user is not already logged in
 # it collects the login data from the user and uses it to log in to the site
@@ -30,7 +32,7 @@ def loginAttempt(driver):
         WebDriverWait(driver, timeout=10).until(
             EC.element_to_be_clickable(
                 (
-                    By.XPATH, 
+                    By.XPATH,
                     '//*[@id="js-XFUniqueId5"]/div/div[2]/div/div/div/div/dl/dd/ul/li/a',
                 )
             )
@@ -66,9 +68,9 @@ def loginAttempt(driver):
 
 def twoFa(driver):
     WebDriverWait(driver, timeout=10).until(
-        EC.presence_of_element_located((By.NAME, 'code'))
+        EC.presence_of_element_located((By.NAME, "code"))
     )
-    twoFaField = driver.find_element(By.NAME, 'code')
+    twoFaField = driver.find_element(By.NAME, "code")
     twofacode = input("Enter 2FA Code:")
     twoFaField.clear()
     twoFaField.send_keys(twofacode)
@@ -78,7 +80,7 @@ def twoFa(driver):
     )
     twofaconfirm.click()
     try:
-        driver.find_element('xpath', '//*[@id="js-XFUniqueId2"]/div/div[1]')
+        driver.find_element("xpath", '//*[@id="js-XFUniqueId2"]/div/div[1]')
     except Exception:
         print("2FA Confirmed")
     else:
@@ -97,13 +99,13 @@ def milpacNav(driver):
     WebDriverWait(driver, timeout=10).until(
         EC.presence_of_element_located(
             (
-                By.XPATH, 
+                By.XPATH,
                 '//*[@id="top"]/div[3]/div[2]/div[2]/div/nav/div/div[2]/div/ul/li[2]/div/a',
             )
         )
     )
     milpacLink = driver.find_element(
-        By.XPATH, 
+        By.XPATH,
         '//*[@id="top"]/div[3]/div[2]/div[2]/div/nav/div/div[2]/div/ul/li[2]/div/a',
     )
     milpacLink.click()
@@ -117,7 +119,7 @@ def milpacCreate(driver):
     WebDriverWait(driver, timeout=10).until(
         EC.presence_of_element_located(
             (
-                By.XPATH, 
+                By.XPATH,
                 '//*[@id="top"]/div[3]/div[2]/div[5]/div/div/div[2]/div[1]/div/div/a',
             )
         )
@@ -129,7 +131,7 @@ def milpacCreate(driver):
     WebDriverWait(driver, timeout=10).until(
         EC.presence_of_element_located(
             (
-                By.XPATH, 
+                By.XPATH,
                 '//*[@id="top"]/div[3]/div[2]/div[5]/div/div/div[2]/div[2]/div/h1',
             )
         )
@@ -138,24 +140,24 @@ def milpacCreate(driver):
     milpacUsernameUpdate = input("Update username to the following:")
     milpacRealName = input("Enter Real Name:")
     milpacJoinDate = input("Enter Join Date:")
-    milpacUsernameEntry = driver.find_element(By.NAME, 'username')
+    milpacUsernameEntry = driver.find_element(By.NAME, "username")
     milpacUsernameEntry.send_keys(milpacUsername)
-    milpacUsernameUpdateEntry = driver.find_element(By.NAME, 'new_username')
+    milpacUsernameUpdateEntry = driver.find_element(By.NAME, "new_username")
     milpacUsernameUpdateCheckbox = driver.find_element(
-        By.XPATH, 
+        By.XPATH,
         '//*[@id="top"]/div[3]/div[2]/div[5]/div/div/div[2]/div[3]/form/div/div/dl[2]/dd/ul/li/label/i',
     )
     milpacUsernameUpdateCheckbox.click()
     milpacUsernameUpdateEntry.send_keys(milpacUsernameUpdate)
-    milpacRealNameEntry = driver.find_element(By.NAME, 'real_name')
+    milpacRealNameEntry = driver.find_element(By.NAME, "real_name")
     milpacRealNameEntry.send_keys(milpacRealName)
-    milpacRankSelect = driver.find_element(By.NAME, 'rank_id')
+    milpacRankSelect = driver.find_element(By.NAME, "rank_id")
     select = Select(milpacRankSelect)
-    select.select_by_visible_text('Recruit')
-    milpacPositionSelect = driver.find_element(By.NAME, 'position_id')
+    select.select_by_visible_text("Recruit")
+    milpacPositionSelect = driver.find_element(By.NAME, "position_id")
     select = Select(milpacPositionSelect)
-    select.select_by_visible_text('New Recruit')
-    milpacJoinDateEntry = driver.find_element(By.NAME, 'custom_fields[joinDate]')
+    select.select_by_visible_text("New Recruit")
+    milpacJoinDateEntry = driver.find_element(By.NAME, "custom_fields[joinDate]")
     milpacJoinDateEntry.send_keys(milpacJoinDate)
-    milpacPromotionDateEntry = driver.find_element(By.NAME, 'custom_fields[promoDate]')
+    milpacPromotionDateEntry = driver.find_element(By.NAME, "custom_fields[promoDate]")
     milpacPromotionDateEntry.send_keys(milpacJoinDate)
