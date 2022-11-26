@@ -1,162 +1,210 @@
+"""Library of Functions."""
+
 import getpass
 
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.wait import WebDriverWait
 
-# this function is called if the user is not already logged in
-# it collects the login data from the user and uses it to log in to the site
-# TODO: Add gui for login credential collection
-# TODO: Add option to securely store login credentials
 
+def login_attempt(driver):
+    """Automatic Site Login.
 
-def loginAttempt(driver):
+    Args:
+        driver (webdriver): selenium webdriver
+    """
     username = input("Enter 7cav.us Username(email):")
     password = getpass.getpass(prompt="Enter 7cav.us Password:")
     try:
         driver.find_element(
             "xpath",
-            '//*[@id="top"]/div[2]/div[2]/div[2]/div/nav/div/div[3]/div[1]/a[1]',
+            '//*[@id="top"]/div[2]/div[2]/div[2]/div\
+                /nav/div/div[3]/div[1]/a[1]',
         )
-    except Exception:
+    except NoSuchElementException:
         print("Retrying Login")
     else:
-        print("Loggin In")
-        loginButton = driver.find_element(
-            "xpath",
-            '//*[@id="top"]/div[2]/div[2]/div[2]/div/nav/div/div[3]/div[1]/a[1]',
-        )
-        loginButton.click()
-        WebDriverWait(driver, timeout=10).until(
-            EC.element_to_be_clickable(
-                (
-                    By.XPATH,
-                    '//*[@id="js-XFUniqueId5"]/div/div[2]/div/div/div/div/dl/dd/ul/li/a',
-                )
-            )
-        )
-        keyCloakButton = driver.find_element(
-            "xpath",
-            '//*[@id="js-XFUniqueId5"]/div/div[2]/div/div/div/div/dl/dd/ul/li/a',
-        )
-        keyCloakButton.click()
+        confirm_login(driver)
     WebDriverWait(driver, timeout=10).until(
-        EC.presence_of_element_located((By.XPATH, '//*[@id="username"]'))
+        ec.presence_of_element_located((By.XPATH, '//*[@id="username"]'))
     )
-    emailField = driver.find_element("xpath", '//*[@id="username"]')
-    passwordField = driver.find_element("xpath", '//*[@id="password"]')
-    loginButton2 = driver.find_element("xpath", '//*[@id="kc-login"]')
-    emailField.clear()
-    emailField.send_keys(username)
-    passwordField.clear()
-    passwordField.send_keys(password)
-    loginButton2.click()
+    email_field = driver.find_element("xpath", '//*[@id="username"]')
+    password_field = driver.find_element("xpath", '//*[@id="password"]')
+    login_button2 = driver.find_element("xpath", '//*[@id="kc-login"]')
+    email_field.clear()
+    email_field.send_keys(username)
+    password_field.clear()
+    password_field.send_keys(password)
+    login_button2.click()
     try:
         driver.find_element("xpath", '//*[@id="kc-content-wrapper"]/div[1]')
-    except Exception:
+    except NoSuchElementException:
         print("Logged in")
     else:
         print("Invalid Username or Password Detected")
-        loginAttempt(driver)
+        login_attempt(driver)
 
 
-# this function is called if 2FA is detected, it requests the 2FA code and then submits it and completes login
-# TODO: Add gui for 2FA code collection
+def confirm_login(driver):
+    """Finishes Login.
 
-
-def twoFa(driver):
+    Args:
+        driver (webdriver): chosen webdriver
+    """
+    print("Logging In")
+    loginbutton = driver.find_element(
+        "xpath",
+        '//*[@id="top"]/div[2]/div[2]/div[2]/div/nav/div/div[3]/div[1]/a[1]',
+    )
+    loginbutton.click()
     WebDriverWait(driver, timeout=10).until(
-        EC.presence_of_element_located((By.NAME, "code"))
+        ec.element_to_be_clickable(
+            (
+                By.XPATH,
+                '//*[@id="js-XFUniqueId5"]/div/div[2]/div/div/div/div/dl/dd\
+                    /ul/li/a',
+            )
+        )
     )
-    twoFaField = driver.find_element(By.NAME, "code")
-    twofacode = input("Enter 2FA Code:")
-    twoFaField.clear()
-    twoFaField.send_keys(twofacode)
-    twofaconfirm = driver.find_element(
+    key_cloak_button = driver.find_element(
+        "xpath",
+        '//*[@id="js-XFUniqueId5"]/div/div[2]/div/div/div/div/dl/dd/ul/li/a',
+    )
+    key_cloak_button.click()
+
+
+def two_fa(driver):
+    """Handle 2fa entry.
+
+    Args:
+        driver (webdriver): selected webdriver
+    """
+    WebDriverWait(driver, timeout=10).until(
+        ec.presence_of_element_located((By.NAME, "code"))
+    )
+    two_fa_field = driver.find_element(By.NAME, "code")
+    two_fa_code = input("Enter 2FA Code:")
+    two_fa_field.clear()
+    two_fa_field.send_keys(two_fa_code)
+    two_fa_confirm = driver.find_element(
         By.XPATH,
-        '//*[@id="top"]/div[2]/div[2]/div[6]/div/div/div[2]/div[2]/form/div/dl/dd/div/div[2]/button',
+        '//*[@id="top"]/div[2]/div[2]/div[6]/div/div/div[2]/div[2]/form/div\
+            /dl/dd/div/div[2]/button',
     )
-    twofaconfirm.click()
+    two_fa_confirm.click()
     try:
         driver.find_element("xpath", '//*[@id="js-XFUniqueId2"]/div/div[1]')
-    except Exception:
+    except NoSuchElementException:
         print("2FA Confirmed")
     else:
         print("Incorrect 2FA Code")
-        closeTwoFaWarning = driver.find_element(
+        close_two_fa_warning = driver.find_element(
             "xpath", '//*[@id="js-XFUniqueId2"]/div/div[1]/a'
         )
-        closeTwoFaWarning.click()
-        twoFa(driver)
+        close_two_fa_warning.click()
+        two_fa(driver)
 
 
 # this function finds the milpac link element on page and then navigates to it
 
 
-def milpacNav(driver):
+def milpac_nav(driver):
+    """Navigates to milpac.
+
+    Args:
+        driver (webdriver)): chosen webdriver
+    """
     WebDriverWait(driver, timeout=10).until(
-        EC.presence_of_element_located(
+        ec.presence_of_element_located(
             (
                 By.XPATH,
-                '//*[@id="top"]/div[3]/div[2]/div[2]/div/nav/div/div[2]/div/ul/li[2]/div/a',
+                '//*[@id="top"]/div[3]/div[2]/div[2]/div/nav/div/div[2]\
+                    /div/ul/li[2]/div/a',
             )
         )
     )
-    milpacLink = driver.find_element(
+    milpac_link = driver.find_element(
         By.XPATH,
-        '//*[@id="top"]/div[3]/div[2]/div[2]/div/nav/div/div[2]/div/ul/li[2]/div/a',
+        '//*[@id="top"]/div[3]/div[2]/div[2]/div/nav/div/div[2]\
+            /div/ul/li[2]/div/a',
     )
-    milpacLink.click()
+    milpac_link.click()
 
 
-# this function finds the add new user button, or reports if the user doesn't have permissions
-# it will then request data from the user and add the new milpac
+def milpac_create(driver):
+    """Create new milpac from user entry.
 
-
-def milpacCreate(driver):
+    Args:
+        driver (webdriver): chosen webdriver
+    """
     WebDriverWait(driver, timeout=10).until(
-        EC.presence_of_element_located(
+        ec.presence_of_element_located(
             (
                 By.XPATH,
-                '//*[@id="top"]/div[3]/div[2]/div[5]/div/div/div[2]/div[1]/div/div/a',
+                '//*[@id="top"]/div[3]/div[2]/div[5]/div/div/div[2]\
+                    /div[1]/div/div/a',
             )
         )
     )
-    addUserButton = driver.find_element(
-        "xpath", '//*[@id="top"]/div[3]/div[2]/div[5]/div/div/div[2]/div[1]/div/div/a'
+    add_user_button = driver.find_element(
+        "xpath", '//*[@id="top"]/div[3]/div[2]/div[5]/div/div/div[2]\
+            /div[1]/div/div/a'
     )
-    addUserButton.click()
+    add_user_button.click()
     WebDriverWait(driver, timeout=10).until(
-        EC.presence_of_element_located(
+        ec.presence_of_element_located(
             (
                 By.XPATH,
-                '//*[@id="top"]/div[3]/div[2]/div[5]/div/div/div[2]/div[2]/div/h1',
+                '//*[@id="top"]/div[3]/div[2]/div[5]/div\
+                    /div/div[2]/div[2]/div/h1',
             )
         )
     )
-    milpacUsername = input("Enter forum username:")
-    milpacUsernameUpdate = input("Update username to the following:")
-    milpacRealName = input("Enter Real Name:")
-    milpacJoinDate = input("Enter Join Date:")
-    milpacUsernameEntry = driver.find_element(By.NAME, "username")
-    milpacUsernameEntry.send_keys(milpacUsername)
-    milpacUsernameUpdateEntry = driver.find_element(By.NAME, "new_username")
-    milpacUsernameUpdateCheckbox = driver.find_element(
+    milpac_username = input("Enter forum username:")
+    milpac_username_update = input("Update username to the following:")
+    milpac_real_name = input("Enter Real Name:")
+    milpac_join_date = input("Enter Join Date:")
+    milpac_username_update_entry = milpac_data_entry(
+        driver, "username", milpac_username, "new_username"
+        )
+
+    milpac_username_update_checkbox = driver.find_element(
         By.XPATH,
-        '//*[@id="top"]/div[3]/div[2]/div[5]/div/div/div[2]/div[3]/form/div/div/dl[2]/dd/ul/li/label/i',
+        '//*[@id="top"]/div[3]/div[2]/div[5]/div/div/div[2]/div[3]\
+            /form/div/div/dl[2]/dd/ul/li/label/i',
     )
-    milpacUsernameUpdateCheckbox.click()
-    milpacUsernameUpdateEntry.send_keys(milpacUsernameUpdate)
-    milpacRealNameEntry = driver.find_element(By.NAME, "real_name")
-    milpacRealNameEntry.send_keys(milpacRealName)
-    milpacRankSelect = driver.find_element(By.NAME, "rank_id")
-    select = Select(milpacRankSelect)
+    milpac_username_update_checkbox.click()
+    milpac_username_update_entry.send_keys(milpac_username_update)
+    milpac_rank_select = milpac_data_entry(
+        driver, "real_name", milpac_real_name, "rank_id"
+        )
+    select = Select(milpac_rank_select)
     select.select_by_visible_text("Recruit")
-    milpacPositionSelect = driver.find_element(By.NAME, "position_id")
-    select = Select(milpacPositionSelect)
+    milpac_position_select = driver.find_element(By.NAME, "position_id")
+    select = Select(milpac_position_select)
     select.select_by_visible_text("New Recruit")
-    milpacJoinDateEntry = driver.find_element(By.NAME, "custom_fields[joinDate]")
-    milpacJoinDateEntry.send_keys(milpacJoinDate)
-    milpacPromotionDateEntry = driver.find_element(By.NAME, "custom_fields[promoDate]")
-    milpacPromotionDateEntry.send_keys(milpacJoinDate)
+    milpac_promotion_date_entry = milpac_data_entry(
+        driver, "custom_fields[joinDate]",
+        milpac_join_date, "custom_fields[promoDate]"
+        )
+
+    milpac_promotion_date_entry.send_keys(milpac_join_date)
+
+
+def milpac_data_entry(driver, arg1, arg2, arg3):
+    """Use args to find field and enter data.
+
+    Args:
+        driver (webdriver): chosen webdriver
+        arg1 (element name): name of element to find
+        arg2 (string): data to enter
+        arg3 (element name): name of element to return
+
+    Returns:
+        element: returns selenium element
+    """
+    milpac_entry = driver.find_element(By.NAME, arg1)
+    milpac_entry.send_keys(arg2)
+    return driver.find_element(By.NAME, arg3)
