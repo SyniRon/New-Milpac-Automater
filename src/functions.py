@@ -149,8 +149,9 @@ def milpac_create(driver):
         )
     )
     add_user_button = driver.find_element(
-        "xpath", '//*[@id="top"]/div[3]/div[2]/div[5]/div/div/div[2]\
-            /div[1]/div/div/a'
+        "xpath",
+        '//*[@id="top"]/div[3]/div[2]/div[5]/div/div/div[2]\
+            /div[1]/div/div/a',
     )
     add_user_button.click()
     WebDriverWait(driver, timeout=10).until(
@@ -168,7 +169,7 @@ def milpac_create(driver):
     milpac_join_date = input("Enter Join Date:")
     milpac_username_update_entry = milpac_data_entry(
         driver, "username", milpac_username, "new_username"
-        )
+    )
 
     milpac_username_update_checkbox = driver.find_element(
         By.XPATH,
@@ -179,16 +180,15 @@ def milpac_create(driver):
     milpac_username_update_entry.send_keys(milpac_username_update)
     milpac_rank_select = milpac_data_entry(
         driver, "real_name", milpac_real_name, "rank_id"
-        )
+    )
     select = Select(milpac_rank_select)
     select.select_by_visible_text("Recruit")
     milpac_position_select = driver.find_element(By.NAME, "position_id")
     select = Select(milpac_position_select)
     select.select_by_visible_text("New Recruit")
     milpac_promotion_date_entry = milpac_data_entry(
-        driver, "custom_fields[joinDate]",
-        milpac_join_date, "custom_fields[promoDate]"
-        )
+        driver, "custom_fields[joinDate]", milpac_join_date, "custom_fields[promoDate]"
+    )
 
     milpac_promotion_date_entry.send_keys(milpac_join_date)
 
