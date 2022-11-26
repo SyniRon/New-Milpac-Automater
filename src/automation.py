@@ -1,10 +1,8 @@
 """Main program file."""
+from functions import login_attempt, milpac_confirm, milpac_create, milpac_nav, two_fa
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
-
-from functions import (login_attempt, milpac_confirm, milpac_create,
-                       milpac_nav, two_fa)
 
 chrome_options = Options()
 chrome_options.add_experimental_option("detach", True)
@@ -19,8 +17,7 @@ print("Trying to Login")
 
 try:
     driver.find_element(
-        "xpath",
-        '//*[@id="top"]/div[2]/div[2]/div[2]/div/nav/div/div[3]/div[1]/a[1]'
+        "xpath", '//*[@id="top"]/div[2]/div[2]/div[2]/div/nav/div/div[3]/div[1]/a[1]'
     )
 except NoSuchElementException:
     print("Already Logged In")

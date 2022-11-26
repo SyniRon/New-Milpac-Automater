@@ -187,8 +187,7 @@ def milpac_create(driver):
     select = Select(milpac_position_select)
     select.select_by_visible_text("New Recruit")
     milpac_promotion_date_entry = milpac_data_entry(
-        driver, "custom_fields[joinDate]",
-        milpac_join_date, "custom_fields[promoDate]"
+        driver, "custom_fields[joinDate]", milpac_join_date, "custom_fields[promoDate]"
     )
 
     milpac_promotion_date_entry.send_keys(milpac_join_date)
@@ -218,8 +217,9 @@ def milpac_confirm(driver):
         driver (webdriver): selected webdriver
     """
     milpac_confirm_button = driver.find_element(
-        By.XPATH, '//*[@id="top"]/div[3]/div[2]/div[5]/div/div/\
-            div[2]/div[3]/form/dl/dd/div/div[2]/button'
+        By.XPATH,
+        '//*[@id="top"]/div[3]/div[2]/div[5]/div/div/\
+            div[2]/div[3]/form/dl/dd/div/div[2]/button',
     )
     milpac_confirm_button.click()
     milpac_confirm_button.click()
