@@ -166,7 +166,7 @@ def milpac_create(driver):
     milpac_username = input("Enter forum username:")
     milpac_username_update = input("Update username to the following:")
     milpac_real_name = input("Enter Real Name:")
-    milpac_join_date = input("Enter Join Date:")
+    milpac_join_date = input("Enter Join Date (YYYY-MM-DD):")
     milpac_username_update_entry = milpac_data_entry(
         driver, "username", milpac_username, "new_username"
     )
@@ -187,7 +187,8 @@ def milpac_create(driver):
     select = Select(milpac_position_select)
     select.select_by_visible_text("New Recruit")
     milpac_promotion_date_entry = milpac_data_entry(
-        driver, "custom_fields[joinDate]", milpac_join_date, "custom_fields[promoDate]"
+        driver, "custom_fields[joinDate]",
+        milpac_join_date, "custom_fields[promoDate]"
     )
 
     milpac_promotion_date_entry.send_keys(milpac_join_date)
@@ -208,3 +209,36 @@ def milpac_data_entry(driver, arg1, arg2, arg3):
     milpac_entry = driver.find_element(By.NAME, arg1)
     milpac_entry.send_keys(arg2)
     return driver.find_element(By.NAME, arg3)
+
+
+def milpac_confirm(driver):
+    """Confirm Milpac Created Succesfully.
+
+    Args:
+        driver (webdriver): selected webdriver
+    """
+    milpac_confirm_button = driver.find_element(
+        By.XPATH, '//*[@id="top"]/div[3]/div[2]/div[5]/div/div/\
+            div[2]/div[3]/form/dl/dd/div/div[2]/button'
+    )
+    milpac_confirm_button.click()
+    milpac_confirm_button.click()
+    try:
+        WebDriverWait(driver, timeout=10).until(
+            ec.presence_of_element_located(
+                (
+                    By.XPATH,
+                    '//*[@id="top"]/div[3]/div[2]/div[5]/div/div\
+                        /div[2]/div[2]/div/div/div/div/button',
+                )
+            )
+        )
+    except NoSuchElementException:
+        print("Invalid Data Entered")
+        milpac_confirm_error_button = driver.find_element(
+            By.XPATH, '//*[@id="js-XFUniqueId3"]/div/div[1]/a'
+        )
+        milpac_confirm_error_button.click()
+        milpac_nav(driver)
+    else:
+        print("Milpac Successfully Created")
