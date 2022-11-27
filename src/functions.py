@@ -21,7 +21,7 @@ def login_attempt(driver):
         driver.find_element(
             "xpath",
             '//*[@id="top"]/div[2]/div[2]/div[2]/div\
-                /nav/div/div[3]/div[1]/a[1]',
+                /nav/div/div[3]/div[1]/a[1]', 
         )
     except NoSuchElementException:
         print("Retrying Login")
@@ -105,9 +105,6 @@ def two_fa(driver):
         )
         close_two_fa_warning.click()
         two_fa(driver)
-
-
-# this function finds the milpac link element on page and then navigates to it
 
 
 def milpac_nav(driver):
@@ -242,3 +239,6 @@ def milpac_confirm(driver):
         milpac_nav(driver)
     else:
         print("Milpac Successfully Created")
+
+def milpac_puc_automation(driver):
+    

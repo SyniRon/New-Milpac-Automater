@@ -1,13 +1,18 @@
 """Main program file."""
-from functions import login_attempt, milpac_confirm, milpac_create, milpac_nav, two_fa
+from functions import (
+    login_attempt,
+    milpac_confirm,
+    milpac_create,
+    milpac_nav,
+    two_fa,
+    milpac_puc_automation,
+)
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
 
 chrome_options = Options()
 chrome_options.add_experimental_option("detach", True)
-
-# this calls the webdriver for chrome and brings up the 7cav site
 
 
 driver = webdriver.Chrome(options=chrome_options)
@@ -39,3 +44,4 @@ else:
 milpac_nav(driver)
 milpac_create(driver)
 milpac_confirm(driver)
+milpac_puc_automation(driver)
