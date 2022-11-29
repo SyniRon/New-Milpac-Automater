@@ -217,6 +217,11 @@ def milpac_confirm(driver):
         return driver.current_url
 
 
+def milpac_puc_add(driver, created_milpac):
+    u_id = created_milpac.replace("https://7cav.us/rosters/profile/?unique_id=", "")
+    driver.get(f"https://7cav.us/rosters/1/awards/add?unique_id={u_id}")
+
+
 try:
     driver.find_element("xpath", '//*[@id="XF"]/body/div[2]/ul/li/div/div[2]/a[1]')
 except NoSuchElementException:
@@ -249,4 +254,4 @@ else:
 
 milpac_create(driver)
 created_milpac = milpac_confirm(driver)
-milpac_confirm(driver)
+milpac_puc_add(driver, created_milpac)
