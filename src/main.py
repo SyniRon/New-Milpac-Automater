@@ -1,12 +1,23 @@
-"""Library of Functions."""
+"""Main program file."""
 
 import getpass
 
+from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.wait import WebDriverWait
+
+chrome_options = Options()
+chrome_options.add_experimental_option("detach", True)
+
+
+driver = webdriver.Chrome(options=chrome_options)
+print("Opening Browser")
+driver.get("https://7cav.us/")
+print("Trying to Login")
 
 
 def login_attempt(driver):
@@ -21,7 +32,7 @@ def login_attempt(driver):
         driver.find_element(
             "xpath",
             '//*[@id="top"]/div[2]/div[2]/div[2]/div\
-                /nav/div/div[3]/div[1]/a[1]', 
+                /nav/div/div[3]/div[1]/a[1]',
         )
     except NoSuchElementException:
         print("Retrying Login")
@@ -240,5 +251,50 @@ def milpac_confirm(driver):
     else:
         print("Milpac Successfully Created")
 
-def milpac_puc_automation(driver):
-    
+
+try:
+    driver.find_element(
+        "xpath", '//*[@id="top"]/div[2]/div[2]/div[2]/div/nav/div/div[3]/div[1]/a[1]'
+    )
+except NoSuchElementException:
+    print("Already Logged In")
+else:
+    login_attempt(driver)
+
+try:
+    driver.find_element(
+        "xpath",
+        '//*[@id="top"]/div[2]/div[2]/div[6]/div/div/div[2]/div[2]/form/div\
+            /div/dl[3]/dd/ul/li/label/span',
+    )
+except NoSuchElementException:
+    print("2FA Not Detected, skipping")
+else:
+    print("2FA Required")
+    two_fa(driver)
+
+try:
+    driver.find_element(
+        "xpath", '//*[@id="top"]/div[2]/div[2]/div[2]/div/nav/div/div[3]/div[1]/a[1]'
+    )
+except NoSuchElementException:
+    print("Already Logged In")
+else:
+    login_attempt(driver)
+
+try:
+    driver.find_element(
+        "xpath",
+        '//*[@id="top"]/div[2]/div[2]/div[6]/div/div/div[2]/div[2]/form/div\
+            /div/dl[3]/dd/ul/li/label/span',
+    )
+except NoSuchElementException:
+    print("2FA Not Detected, skipping")
+else:
+    print("2FA Required")
+    two_fa(driver)
+
+
+milpac_nav(driver)
+milpac_create(driver)
+milpac_confirm(driver)
