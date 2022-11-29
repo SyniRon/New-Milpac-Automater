@@ -1,6 +1,7 @@
 """Main program file."""
 
 import getpass
+import time
 
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
@@ -10,18 +11,23 @@ from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.wait import WebDriverWait
 
+# testing code to make browser stay open after runtime completion
+# TODO: remove testing code and make headless
 chrome_options = Options()
 chrome_options.add_experimental_option("detach", True)
 
-
+# set driver to use selected options
 driver = webdriver.Chrome(options=chrome_options)
+# testing code while browser isn't headless
+# TODO: remove irrelevant size code once browser is headless
+driver.set_window_size(1920, 1080)
 print("Opening Browser")
 driver.get("https://7cav.us/")
 print("Trying to Login")
 
 
 def ele_int(ele_type, ele, int_type, load=""):
-    """Click eleement given.
+    """Interact with given element in chosen way.
 
     Args:
         ele_type (string): type of element to be clicked
@@ -32,22 +38,26 @@ def ele_int(ele_type, ele, int_type, load=""):
         3 = select from dropdown list
         load (string): payload if needed
     """
-    try:
-        int_it = WebDriverWait(driver, timeout=10).until(
-            lambda d: d.find_element(ele_type, ele)
-        )
-        if int_type == 1:
-            int_it.click()
-        elif int_type == 2:
-            int_it.clear()
-            int_it.send_keys(load)
-        elif int_type == 3:
-            select = Select(int_it)
-            select.select_by_visible_text(load)
-        else:
-            print("Invalid interaction type sent")
-    except TimeoutError:
-        print("Element not found in time")
+    # we are waiting to see if the element requested
+    # exists or not and giving time for it to render
+    # if it doesn't after 10 seconds a timeout is thrown
+    int_it = WebDriverWait(driver, timeout=10).until(
+        lambda d: d.find_element(ele_type, ele)
+    )
+    # if payload int is 1 we're clicking
+    if int_type == 1:
+        int_it.click()
+    # if payload int is 2 we're sending keys
+    elif int_type == 2:
+        int_it.clear()
+        int_it.send_keys(load)
+    # if payload int is 3 we're selecing from a list
+    elif int_type == 3:
+        select = Select(int_it)
+        select.select_by_visible_text(load)
+    # if the payload has a bad int_type we error out
+    else:
+        raise ValueError("Invalid int_type selection")
 
 
 def login_attempt(driver):
@@ -107,6 +117,8 @@ def two_fa(driver):
     """
     # requests 2FA code from user and stores to variable
     two_fa_code = input("Enter 2FA Code:")
+    # scroll to bottom of page to avoid click intercept
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     # enters 2FA code into box
     ele_int("name", "code", 2, two_fa_code)
     # clicks confirm button
@@ -117,40 +129,23 @@ def two_fa(driver):
         1,
     )
     try:
-        driver.find_element("xpath", '//*[@id="js-XFUniqueId2"]/div/div[1]')
-    except NoSuchElementException:
-        print("2FA Confirmed")
-    else:
+        WebDriverWait(driver, timeout=1).until(ec.url_matches("https://7cav.us/"))
+    except TimeoutError:
         print("Incorrect 2FA Code")
         ele_int("xpath", '//*[@id="js-XFUniqueId2"]/div/div[1]/a', 1)
         two_fa(driver)
-
-
-def milpac_nav(driver):
-    """Navigates to milpac.
-
-    Args:
-        driver (webdriver)): chosen webdriver
-    """
-    ele_int(
-        "xpath",
-        '//*[@id="top"]/div[3]/div[2]/div[2]/div/nav/div/div[2]/div/ul/li[2]/div/a',
-        1,
-    )
+    else:
+        print("2FA Confirmed")
 
 
 def milpac_create(driver):
-    """Create new milpac from user entry.
+    """Create new milpac on combat roster from user entry.
 
     Args:
         driver (webdriver): chosen webdriver
     """
-    ele_int(
-        "xpath",
-        '//*[@id="top"]/div[3]/div[2]/div[5]/div/div/div[2]\
-            /div[1]/div/div/a',
-        1,
-    )
+    time.sleep(0.5)
+    driver.get("https://7cav.us/rosters/1/add-user")
     # waits for create milpac page to load
     WebDriverWait(driver, timeout=10).until(
         ec.presence_of_element_located(
@@ -213,9 +208,21 @@ def milpac_confirm(driver):
     except NoSuchElementException:
         print("Invalid Data Entered, Try Again")
         ele_int("xpath", '//*[@id="js-XFUniqueId3"]/div/div[1]/a', 1)
-        milpac_nav(driver)
+        milpac_create(driver)
     else:
         print("Milpac Successfully Created")
+        WebDriverWait(driver, timeout=10).until(
+            ec.url_contains("https://7cav.us/rosters/profile/?unique_id=")
+        )
+        return driver.current_url
+
+
+try:
+    driver.find_element("xpath", '//*[@id="XF"]/body/div[2]/ul/li/div/div[2]/a[1]')
+except NoSuchElementException:
+    pass
+else:
+    ele_int("xpath", '//*[@id="XF"]/body/div[2]/ul/li/div/div[2]/a[1]', 1)
 
 
 try:
@@ -240,6 +247,6 @@ else:
     two_fa(driver)
 
 
-milpac_nav(driver)
 milpac_create(driver)
+created_milpac = milpac_confirm(driver)
 milpac_confirm(driver)
