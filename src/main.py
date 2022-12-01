@@ -1,6 +1,5 @@
 """Main program file."""
 
-import getpass
 import os
 import time
 
@@ -16,8 +15,8 @@ from selenium.webdriver.support.wait import WebDriverWait
 # testing code to make browser stay open after runtime completion
 # TODO: remove testing code and make headless
 chrome_options = Options()
-chrome_options.add_argument("--headless")
-# chrome_options.add_experimental_option("detach", True)
+# chrome_options.add_argument("--headless")
+chrome_options.add_experimental_option("detach", True)
 
 # set driver to use selected options
 driver = webdriver.Chrome(options=chrome_options)
@@ -83,7 +82,7 @@ def login_attempt(driver, username, password, frame):
     """
     # username = input("Enter 7cav.us Username(email):")
     # password = getpass.getpass(prompt="Enter 7cav.us Password:")
-    try:
+    """try:
         driver.find_element(
             "xpath",
             '//*[@id="top"]/div[2]/div[2]/div[2]/div\
@@ -92,7 +91,15 @@ def login_attempt(driver, username, password, frame):
     except NoSuchElementException:
         print("Retrying Login")
     else:
-        confirm_login(driver)
+        confirm_login(driver)"""
+    try:
+        driver.find_element("xpath", '//*[@id="XF"]/body/div[2]/ul/li/div/div[2]/a[1]')
+    except NoSuchElementException:
+        pass
+    else:
+        ele_int("xpath", '//*[@id="XF"]/body/div[2]/ul/li/div/div[2]/a[1]', 1)
+    driver.get("https://7cav.us/register/connected-accounts/keycloak/?setup=1")
+    time.sleep(0.1)
     # input username
     ele_int("xpath", '//*[@id="username"]', 2, username)
     ele_int("xpath", '//*[@id="password"]', 2, password)
@@ -101,7 +108,17 @@ def login_attempt(driver, username, password, frame):
         driver.find_element("xpath", '//*[@id="kc-content-wrapper"]/div[1]')
     except NoSuchElementException:
         print("Logged in")
-        confirm_login(driver)
+        try:
+            driver.find_element(
+                "xpath",
+                '//*[@id="top"]/div[2]/div[2]/div[6]/div/div/div[2]/div[2]/form/div\
+                    /div/dl[3]/dd/ul/li/label/span',
+            )
+        except NoSuchElementException:
+            print("2FA Not Detected, skipping")
+        else:
+            print("2FA Required")
+            twofa_screen()
     else:
         print("Invalid Username or Password Detected")
         wrong_pword = ctk.CTkLabel(master=frame, text="Invalid Username or Password")
@@ -109,36 +126,7 @@ def login_attempt(driver, username, password, frame):
         wrong_pword.after(7000, wrong_pword.destroy)
 
 
-def confirm_login(driver):
-    """Finishes Login.
-
-    Args:
-        driver (webdriver): chosen webdriver
-    """
-    print("Logging In")
-    ele_int(
-        "xpath", '//*[@id="top"]/div[2]/div[2]/div[2]/div/nav/div/div[3]/div[1]/a[1]', 1
-    )
-    ele_int(
-        "xpath",
-        '//*[@id="js-XFUniqueId5"]/div/div[2]/div/div/div/div/dl/dd\
-                    /ul/li/a',
-        1,
-    )
-    try:
-        driver.find_element(
-            "xpath",
-            '//*[@id="top"]/div[2]/div[2]/div[6]/div/div/div[2]/div[2]/form/div\
-                /div/dl[3]/dd/ul/li/label/span',
-        )
-    except NoSuchElementException:
-        print("2FA Not Detected, skipping")
-    else:
-        print("2FA Required")
-        twofa_screen()
-
-
-def two_fa(driver, twofa_code):
+def two_fa(driver, twofa_code, frame):
     """Handle 2fa entry.
 
     Args:
@@ -157,18 +145,25 @@ def two_fa(driver, twofa_code):
             /dl/dd/div/div[2]/button',
         1,
     )
-    try:
-        WebDriverWait(driver, timeout=1).until(ec.url_matches("https://7cav.us/"))
-    except TimeoutError:
+    time.sleep(0.2)
+    if ec.title_contains("Two-step verification required"):
         print("Incorrect 2FA Code")
         ele_int("xpath", '//*[@id="js-XFUniqueId2"]/div/div[1]/a', 1)
-        two_fa(driver)
+        wrong_twofa = ctk.CTkLabel(master=frame, text="Invalid 2FA Code")
+        wrong_twofa.pack(pady=12, padx=10)
+        wrong_twofa.after(7000, wrong_twofa.destroy)
     else:
         print("2FA Confirmed")
+        entry_screen()
 
 
 def milpac_create(
-    driver, milpac_username, milpac_username_update, milpac_real_name, milpac_join_date
+    driver,
+    milpac_username,
+    milpac_username_update,
+    milpac_real_name,
+    milpac_join_date,
+    frame,
 ):
     """Create new milpac on combat roster from user entry.
 
@@ -206,9 +201,10 @@ def milpac_create(
     ele_int("name", "position_id", 3, "New Recruit")
     ele_int("name", "custom_fields[joinDate]", 2, milpac_join_date)
     ele_int("name", "custom_fields[promoDate]", 2, milpac_join_date)
+    return milpac_confirm(driver, frame)
 
 
-def milpac_confirm(driver):
+def milpac_confirm(driver, frame):
     """Confirm Milpac Created Succesfully.
 
     Args:
@@ -239,13 +235,16 @@ def milpac_confirm(driver):
     except NoSuchElementException:
         print("Invalid Data Entered, Try Again")
         ele_int("xpath", '//*[@id="js-XFUniqueId3"]/div/div[1]/a', 1)
-        milpac_create(driver)
+        wrong_milpac = ctk.CTkLabel(master=frame, text="Invalid 2FA Code")
+        wrong_milpac.pack(pady=12, padx=10)
+        wrong_milpac.after(7000, wrong_milpac.destroy)
     else:
         print("Milpac Successfully Created")
         WebDriverWait(driver, timeout=10).until(
             ec.url_contains("https://7cav.us/rosters/profile/?unique_id=")
         )
-        return driver.current_url
+        created_milpac = driver.current_url
+        milpac_puc_add(driver, created_milpac)
 
 
 def milpac_puc_add(driver, created_milpac):
@@ -369,7 +368,17 @@ def entry_screen():
     milpac_join_date_entry = ctk.CTkEntry(master=frame, placeholder_text="YYYY-MM-DD")
     milpac_join_date_entry.pack(pady=12, padx=10)
 
-    button = ctk.CTkButton(master=frame, text="Submit", command=milpac_button_event)
+    button = ctk.CTkButton(
+        master=frame,
+        text="Submit",
+        command=lambda: milpac_button_event(
+            milpac_username_entry,
+            milpac_username_update_entry,
+            milpac_real_name_entry,
+            milpac_join_date_entry,
+            frame,
+        ),
+    )
     button.pack(pady=12, padx=10)
 
 
@@ -384,30 +393,41 @@ def twofa_screen():
     label2 = ctk.CTkLabel(master=frame, text="Please enter your Two Factor Code")
     label2.pack(pady=12, padx=10)
 
-    twofa_entry = ctk.CTkEntry(master=frame, placeholder_text="Old Username")
+    twofa_entry = ctk.CTkEntry(master=frame, placeholder_text="2FA Code")
     twofa_entry.pack(pady=12, padx=10)
 
-    button = ctk.CTkButton(master=frame, text="Submit", command=twofa_button_event)
+    button = ctk.CTkButton(
+        master=frame,
+        text="Submit",
+        command=lambda: twofa_button_event(twofa_entry, frame),
+    )
     button.pack(pady=12, padx=10)
 
 
-def milpac_button_event():
+def milpac_button_event(
+    milpac_username_entry,
+    milpac_username_update_entry,
+    milpac_real_name_entry,
+    milpac_join_date_entry,
+    frame,
+):
     milpac_username = milpac_username_entry.get()
     milpac_username_update = milpac_username_update_entry.get()
     milpac_real_name = milpac_real_name_entry.get()
     milpac_join_date = milpac_join_date_entry.get()
-    milpac_create(
+    return milpac_create(
         driver,
         milpac_username,
         milpac_username_update,
         milpac_real_name,
         milpac_join_date,
+        frame,
     )
 
 
-def twofa_button_event():
+def twofa_button_event(twofa_entry, frame):
     twofa_code = twofa_entry.get()
-    two_fa(driver, twofa_code)
+    two_fa(driver, twofa_code, frame)
 
 
 login_screen()
