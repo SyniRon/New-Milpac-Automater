@@ -1,8 +1,8 @@
 """Main program file."""
 
 import getpass
-import time
 import os
+import time
 
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
