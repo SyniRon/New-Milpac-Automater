@@ -2,6 +2,7 @@
 
 import getpass
 import time
+import os
 
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
@@ -20,7 +21,7 @@ chrome_options.add_experimental_option("detach", True)
 driver = webdriver.Chrome(options=chrome_options)
 # testing code while browser isn't headless
 # TODO: remove irrelevant size code once browser is headless
-driver.set_window_size(1920, 1080)
+driver.set_window_size(1024, 768)
 print("Opening Browser")
 driver.get("https://7cav.us/")
 print("Trying to Login")
@@ -218,8 +219,52 @@ def milpac_confirm(driver):
 
 
 def milpac_puc_add(driver, created_milpac):
+    """Add Pres Unit Citation awards to created milpac.
+
+    Args:
+        driver (webdriver): chosen webdriver
+        created_milpac (string): url of created milpac
+    """
+    # grab user id of milpac to add pucs to
     u_id = created_milpac.replace("https://7cav.us/rosters/profile/?unique_id=", "")
-    driver.get(f"https://7cav.us/rosters/1/awards/add?unique_id={u_id}")
+    # paths are media/puc1-6.jpg
+    # build dictionary of files to upload
+    puc_dict = {
+        "/media/puc1.jpg": "2003-03-18",
+        "/media/puc2.jpg": "2004-09-01",
+        "/media/puc3.jpg": "2009-08-10",
+        "/media/puc4.jpg": "2010-09-18",
+        "/media/puc5.jpg": "2011-06-02",
+        "/media/puc6.jpg": "2021-05-16",
+    }
+    # iterate through dict to add each puc
+    for puc_img, puc_date in puc_dict.items():
+        # navigate to add award page for the milpac
+        driver.get(f"https://7cav.us/rosters/1/awards/add?unique_id={u_id}")
+        # sleep a moment to let the page load
+        time.sleep(0.2)
+        # select the award name
+        ele_int("name", "award_id", 3, "Army & Air Force Presidential Unit Citation")
+        # input the award date
+        ele_int("name", "award_date", 2, puc_date)
+        # upload the correct file
+        ele_int("name", "upload", 2, os.getcwd() + puc_img)
+        # click the calendar button to make it go away
+        ele_int(
+            "xpath",
+            '//*[@id="top"]/div[3]/div[2]/div[5]/div/div/div[2]/div[3]/form/div/div/dl\
+                [3]/dd/div/span',
+            1,
+        )
+        # click the save button
+        ele_int(
+            "xpath",
+            '//*[@id="top"]/div[3]/div[2]/div[5]/div/div/div[2]/div[3]/form/div/dl/dd/\
+                div/div[2]/button',
+            1,
+        )
+        # wait a sec for site loading
+        time.sleep(0.2)
 
 
 try:
