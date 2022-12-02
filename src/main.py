@@ -15,14 +15,14 @@ from selenium.webdriver.support.wait import WebDriverWait
 # testing code to make browser stay open after runtime completion
 # TODO: remove testing code and make headless
 chrome_options = Options()
-# chrome_options.add_argument("--headless")
-chrome_options.add_experimental_option("detach", True)
+chrome_options.add_argument("--headless")
+# chrome_options.add_experimental_option("detach", True)
 
 # set driver to use selected options
 driver = webdriver.Chrome(options=chrome_options)
 # testing code while browser isn't headless
 # TODO: remove irrelevant size code once browser is headless
-driver.set_window_size(1024, 768)
+# driver.set_window_size(1024, 768)
 # opens the browser to 7cav.us
 print("Opening Browser")
 driver.get("https://7cav.us/")
@@ -32,7 +32,7 @@ ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
 
 root = ctk.CTk()
-root.geometry("500x350")
+root.geometry("500x800")
 
 
 def clear_frame():
@@ -145,8 +145,13 @@ def two_fa(driver, twofa_code, frame):
             /dl/dd/div/div[2]/button',
         1,
     )
-    time.sleep(0.2)
-    if ec.title_contains("Two-step verification required"):
+    time.sleep(1)
+    try:
+        driver.find_element(
+            By.XPATH,
+            "/html/body/div[1]/div[3]/div[2]/div[2]/div/nav/div/div[3]/div[1]/a[3]",
+        )
+    except NoSuchElementException:
         print("Incorrect 2FA Code")
         ele_int("xpath", '//*[@id="js-XFUniqueId2"]/div/div[1]/a', 1)
         wrong_twofa = ctk.CTkLabel(master=frame, text="Invalid 2FA Code")
@@ -294,6 +299,7 @@ def milpac_puc_add(driver, created_milpac):
         )
         # wait a sec for site loading
         time.sleep(0.2)
+        repeat_screen()
 
 
 def login_button_event(uname_entry, pword_entry, frame):
@@ -402,6 +408,42 @@ def twofa_screen():
         command=lambda: twofa_button_event(twofa_entry, frame),
     )
     button.pack(pady=12, padx=10)
+
+
+def repeat_screen():
+    clear_frame()
+    frame = ctk.CTkFrame(master=root)
+    frame.pack(pady=20, padx=60, fill="both", expand=True)
+
+    repeat_label = ctk.CTkLabel(
+        master=frame, text="Do you have any more entries to add?"
+    )
+    repeat_label.pack(pady=12, padx=10)
+
+    repeat_button = ctk.CTkButton(master=frame, text="Yes", command=repeat_yes_button)
+    repeat_button.pack(pady=12, padx=10)
+
+    repeat_button_2 = ctk.CTkButton(master=frame, text="No", command=repeat_no_button)
+    repeat_button_2.pack(pady=12, padx=10)
+
+
+def repeat_yes_button():
+    entry_screen()
+
+
+def repeat_no_button():
+    clear_frame()
+    frame = ctk.CTkFrame(master=root)
+    frame.pack(pady=20, padx=60, fill="both", expand=True)
+
+    exit_label = ctk.CTkLabel(
+        master=frame,
+        text="Thank you for using the Milpac Creation Automator by Sypolt.R",
+    )
+    exit_label.pack(pady=12, padx=10)
+
+    exit_button = ctk.CTkButton(master=frame, text="Exit", command=exit)
+    exit_button.pack(padx=12, pady=10)
 
 
 def milpac_button_event(
